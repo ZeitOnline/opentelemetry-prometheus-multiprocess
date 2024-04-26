@@ -1,6 +1,7 @@
 from threading import Lock
 from typing import Dict, Optional, Sequence, Union
 import logging
+import re
 
 from opentelemetry.metrics import (
     MeterProvider,
@@ -159,7 +160,14 @@ class PrometheusMetric:
             description: str = '',
     ) -> None:
         super().__init__(name, unit=unit, description=description)
-        self._metric = self.metric_cls(name, description, unit=unit)
+        self._metric = self.metric_cls(
+            self._sanitize(name), description, unit=unit)
+
+    NON_ALPHANUMERIC = re.compile(r'[^\w]')
+
+    def _sanitize(self, text: str) -> str:
+        # Taken from opentelemetry-exporter-prometheus
+        return self.NON_ALPHANUMERIC.sub('_', text)
 
     def metric(
             self, attributes: Dict[str, str] = None
