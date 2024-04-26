@@ -18,6 +18,7 @@ from opentelemetry.metrics import (
     UpDownCounter,
 )
 from opentelemetry.sdk.util.instrumentation import InstrumentationScope
+from prometheus_client.samples import Sample
 import prometheus_client
 import prometheus_client.metrics
 
@@ -174,6 +175,17 @@ class PrometheusMetric:
             self, attributes: Dict[str, str] = None
     ) -> prometheus_client.metrics.MetricWrapperBase:
         return self._metric
+
+
+def _multi_samples_with_labels(self):
+    with self._lock:
+        metrics = self._metrics.copy()
+    for labels, metric in metrics.items():
+        series_labels = list(zip(self._labelnames, labels))
+        for suffix, sample_labels, value, timestamp, exemplar in metric._samples():
+            yield Sample(
+                suffix, dict(series_labels + list(sample_labels.items())),
+                value, timestamp, exemplar)
 
 
 class PrometheusCounter(PrometheusMetric, Counter):
