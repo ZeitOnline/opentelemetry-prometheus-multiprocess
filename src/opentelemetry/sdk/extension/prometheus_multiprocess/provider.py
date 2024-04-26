@@ -163,7 +163,13 @@ class PrometheusMetric:
     ) -> None:
         super().__init__(name, unit=unit, description=description)
         self._metric = self.metric_cls(
-            self._sanitize(name), description, unit=unit, **self.metric_kw)
+            self._sanitize(name), description,
+            # Initialize as "parent" (i.e. with labels) by default
+            labelnames=self.DYNAMIC_LABELS,
+            unit=unit, **self.metric_kw)
+        self._support_dynamic_labels()
+        self._lock = Lock()
+        self._seen_labelnames = []
 
     NON_ALPHANUMERIC = re.compile(r'[^\w]')
 
@@ -171,17 +177,53 @@ class PrometheusMetric:
         # Taken from opentelemetry-exporter-prometheus
         return self.NON_ALPHANUMERIC.sub('_', text)
 
+    DYNAMIC_LABELS = ('fake_label_to_treat_metric_instance_as_parent',)
+
+    def _support_dynamic_labels(self):
+        m = self._metric
+        m._multi_samples = _multi_samples_with_labels.__get__(m)
+        # Allow using without any labels
+        m._labelnames = ()
+        m._metric_init_done = False
+
     def metric(
             self, attributes: Dict[str, str] = None
     ) -> prometheus_client.metrics.MetricWrapperBase:
-        return self._metric
+        if not attributes:
+            if not self._metric._metric_init_done:
+                self._metric._metric_init()
+            return self._metric
+
+        if self._metric._metric_init_done:
+            raise ValueError(
+                '%s already has values without any labels, cannot add %s' %
+                (self, attributes))
+
+        with self._lock:
+            attributes = {self._sanitize(k): v for k, v in attributes.items()}
+            names = tuple(attributes)
+            for seen in self._seen_labelnames:
+                if len(seen) == len(names) and seen != names:
+                    raise ValueError(
+                        '%s already has values with labels %s, cannot add %s '
+                        'of same length' % (self, seen, attributes))
+            else:
+                self._seen_labelnames.append(names)
+
+            self._metric._labelnames = tuple(attributes)
+            metric = self._metric.labels(**attributes)
+            self._metric._labelnames = self.DYNAMIC_LABELS
+        return metric
 
 
 def _multi_samples_with_labels(self):
+    """Patched to retrieve labelnames from each child metric instead of the
+    parent, to support samples with non-uniform labels, e.g. with and without
+    an `error` label."""
     with self._lock:
         metrics = self._metrics.copy()
     for labels, metric in metrics.items():
-        series_labels = list(zip(self._labelnames, labels))
+        series_labels = list(zip(metric._labelnames, labels))  # patched
         for suffix, sample_labels, value, timestamp, exemplar in metric._samples():
             yield Sample(
                 suffix, dict(series_labels + list(sample_labels.items())),
