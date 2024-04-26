@@ -1,0 +1,44 @@
+[project]
+name = "opentelemetry-sdk-extension-prometheus-multiprocess"
+authors = [{ name = "Zeit Online", email = "zon-backend@zeit.de" }]
+dynamic = ["version", "readme"]
+dependencies = [
+    "opentelemetry-sdk",
+    "requests",
+]
+
+[project.optional-dependencies]
+test = [
+    "pytest",
+]
+
+[build-system]
+requires = ["hatchling", "hatch-fancy-pypi-readme"]
+build-backend = "hatchling.build"
+[tool.hatch.version]
+path = "src/opentelemetry/sdk/extension/prometheus_multiprocess/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/opentelemetry"]
+
+[tool.hatch.metadata.hooks.fancy-pypi-readme]
+content-type = "text/x-rst"
+fragments = [{path="README.rst"}, {text="\n\n"}, {path="CHANGES.rst"}]
+
+[tool.pytest.ini_options]
+addopts = "--tb=native"
+filterwarnings = [
+  "error",
+]
+
+[tool.towncrier]
+directory = "docs/changelog/"
+filename = "CHANGES.rst"
+title_format = ""
+# First underline is used for version/date header.
+# Second underline is used for the type names (like 'Bug fixes:').
+underlines = ["-", "+"]
+[[tool.towncrier.type]]
+directory = "change"
+name = "Changes"  # I'd love to omit the category, but that requires copy&paste of the whole template
+showcontent = true
