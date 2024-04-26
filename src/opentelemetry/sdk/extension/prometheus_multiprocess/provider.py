@@ -152,6 +152,7 @@ class PrometheusMeter(Meter):
 class PrometheusMetric:
 
     metric_cls: type[prometheus_client.metrics.MetricWrapperBase] = object
+    metric_kw = {}
 
     def __init__(
             self,
@@ -161,7 +162,7 @@ class PrometheusMetric:
     ) -> None:
         super().__init__(name, unit=unit, description=description)
         self._metric = self.metric_cls(
-            self._sanitize(name), description, unit=unit)
+            self._sanitize(name), description, unit=unit, **self.metric_kw)
 
     NON_ALPHANUMERIC = re.compile(r'[^\w]')
 
@@ -213,6 +214,24 @@ class PrometheusGauge(PrometheusMetric, Gauge):
 class PrometheusHistogram(PrometheusMetric, Histogram):
 
     metric_cls = prometheus_client.Histogram
+    metric_kw = {'buckets': (
+        # Taken from opentelemetry.sdk.aggregation
+        0.0,
+        5.0,
+        10.0,
+        25.0,
+        50.0,
+        75.0,
+        100.0,
+        250.0,
+        500.0,
+        750.0,
+        1000.0,
+        2500.0,
+        5000.0,
+        7500.0,
+        10000.0,
+    )}
 
     def record(
         self, amount: Union[int, float], attributes: Dict[str, str] = None
