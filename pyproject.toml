@@ -5,6 +5,7 @@ dynamic = ["version", "readme"]
 dependencies = [
     "opentelemetry-sdk",
     "requests",
+    "opentelemetry-exporter-prometheus",
 ]
 
 [project.optional-dependencies]
