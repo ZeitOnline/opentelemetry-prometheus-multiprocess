@@ -3,6 +3,11 @@ from typing import Dict, Optional, Sequence, Union
 import logging
 import re
 
+from opentelemetry.exporter.prometheus._mapping import (
+    map_unit,
+    sanitize_attribute,
+    sanitize_full_name,
+)
 from opentelemetry.metrics import (
     MeterProvider,
     Meter,
@@ -163,19 +168,15 @@ class PrometheusMetric:
     ) -> None:
         super().__init__(name, unit=unit, description=description)
         self._metric = self.metric_cls(
-            self._sanitize(name), description,
+            sanitize_full_name(name), description,
             # Initialize as "parent" (i.e. with labels) by default
             labelnames=self.DYNAMIC_LABELS,
-            unit=unit, **self.metric_kw)
+            unit=map_unit(unit), **self.metric_kw)
         self._support_dynamic_labels()
         self._lock = Lock()
         self._seen_labelnames = []
 
     NON_ALPHANUMERIC = re.compile(r'[^\w]')
-
-    def _sanitize(self, text: str) -> str:
-        # Taken from opentelemetry-exporter-prometheus
-        return self.NON_ALPHANUMERIC.sub('_', text)
 
     DYNAMIC_LABELS = ('fake_label_to_treat_metric_instance_as_parent',)
 
@@ -200,7 +201,7 @@ class PrometheusMetric:
                 (self, attributes))
 
         with self._lock:
-            attributes = {self._sanitize(k): v for k, v in attributes.items()}
+            attributes = {sanitize_attribute(k): v for k, v in attributes.items()}
             names = tuple(attributes)
             for seen in self._seen_labelnames:
                 if len(seen) == len(names) and seen != names:
