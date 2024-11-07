@@ -235,29 +235,38 @@ class PrometheusCounter(PrometheusMetric, Counter):
 
     metric_cls = prometheus_client.Counter
 
-    def add(self, amount, *args, **kw):
+    def add(
+        self, amount: Union[int, float], attributes: Dict[str, str] = None,
+        context=None
+    ):
         if amount < 0:
             _logger.warning(
                 'Add amount must be non-negative on Counter %s.', self.name
             )
             return
-        self.metric(kw['attributes']).inc(amount)
+        self.metric(attributes).inc(amount)
 
 
 class PrometheusUpDownCounter(PrometheusMetric, UpDownCounter):
 
     metric_cls = prometheus_client.Gauge
 
-    def add(self, amount, *args, **kw):
-        self.metric(kw['attributes']).inc(amount)
+    def add(
+        self, amount: Union[int, float], attributes: Dict[str, str] = None,
+        context=None
+    ):
+        self.metric(attributes).inc(amount)
 
 
 class PrometheusGauge(PrometheusMetric, Gauge):
 
     metric_cls = prometheus_client.Gauge
 
-    def set(self, amount, *args, **kw):
-        self.metric(kw['attributes']).set(amount)
+    def set(
+        self, amount: Union[int, float], attributes: Dict[str, str] = None,
+        context=None
+    ):
+        self.metric(attributes).set(amount)
 
 
 class PrometheusHistogram(PrometheusMetric, Histogram):
@@ -282,10 +291,13 @@ class PrometheusHistogram(PrometheusMetric, Histogram):
         10000.0,
     )}
 
-    def record(self, amount, *args, **kw):
+    def record(
+        self, amount: Union[int, float], attributes: Dict[str, str] = None,
+        context=None
+    ):
         if amount < 0:
             _logger.warning(
                 'Record amount must be non-negative on Histogram %s.', self.name
             )
             return
-        self.metric(kw['attributes']).observe(amount)
+        self.metric(attributes).observe(amount)
