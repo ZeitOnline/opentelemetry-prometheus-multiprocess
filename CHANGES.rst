@@ -3,6 +3,15 @@ Changelog
 
 .. towncrier release notes start
 
+1.1.1 (2024-11-07)
+------------------
+
+Changes
++++++++
+
+- Accept kw to make otel API forward-compatible (fwcompat)
+
+
 1.1.0 (2024-06-25)
 ------------------
 
