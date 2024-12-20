@@ -3,6 +3,15 @@ Changelog
 
 .. towncrier release notes start
 
+1.2.0 (2024-12-20)
+------------------
+
+Changes
++++++++
+
+- Support seconds as well as milliseconds in histogram buckets (histogram)
+
+
 1.1.2 (2024-11-07)
 ------------------
 
