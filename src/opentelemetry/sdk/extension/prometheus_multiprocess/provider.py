@@ -271,9 +271,8 @@ class PrometheusGauge(PrometheusMetric, Gauge):
 
 class PrometheusHistogram(PrometheusMetric, Histogram):
 
-    metric_cls = prometheus_client.Histogram
-    metric_kw = {'buckets': (
-        # Taken from opentelemetry.sdk.aggregation
+    boundaries = (
+        # Taken from opentelemetry ExplicitBucketHistogramAggregation
         0.0,
         5.0,
         10.0,
@@ -289,7 +288,20 @@ class PrometheusHistogram(PrometheusMetric, Histogram):
         5000.0,
         7500.0,
         10000.0,
-    )}
+    )
+
+    metric_cls = prometheus_client.Histogram
+
+    def __init__(
+            self,
+            name: str,
+            unit: str = '',
+            description: str = '',
+    ) -> None:
+        if unit == 's':  # XXX kludgy
+            self.boundaries = (x / 1000 for x in self.boundaries)
+        self.metrics_kw = {'buckets': self.boundaries}
+        super().__init__(name, unit, description)
 
     def record(
         self, amount: Union[int, float], attributes: Dict[str, str] = None,
