@@ -3,6 +3,15 @@ Changelog
 
 .. towncrier release notes start
 
+1.2.1 (2025-02-05)
+------------------
+
+Changes
++++++++
+
+- Update to otel 1.30 API (otel)
+
+
 1.2.0 (2024-12-20)
 ------------------
 
