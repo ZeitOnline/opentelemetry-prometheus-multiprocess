@@ -69,26 +69,23 @@ class PrometheusMeter(Meter):
 
     # Extracted from opentelemetry.sdk.metrics.Meter
     def _create(self, api, cls, name, unit, description) -> Instrument:
-        (
-            is_instrument_registered,
-            instrument_id,
-        ) = self._is_instrument_registered(name, cls, unit, description)
+        status = self._register_instrument(name, cls, unit, description)
 
-        if is_instrument_registered:
-            _logger.warning(
-                'An instrument with name %s, type %s, unit %s and '
-                'description %s has been created already.',
+        if status.conflict:
+            self._log_instrument_registration_conflict(
                 name,
                 api.__name__,
                 unit,
                 description,
+                status
             )
+        if status.already_registered:
             with self._instrument_id_instrument_lock:
-                return self._instrument_id_instrument[instrument_id]
+                return self._instrument_id_instrument[status.instrument_id]
 
         instrument = cls(name, unit, description)
         with self._instrument_id_instrument_lock:
-            self._instrument_id_instrument[instrument_id] = instrument
+            self._instrument_id_instrument[status.instrument_id] = instrument
             return instrument
 
     def create_counter(
