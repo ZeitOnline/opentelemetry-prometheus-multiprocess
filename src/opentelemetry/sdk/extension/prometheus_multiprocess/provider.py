@@ -23,6 +23,7 @@ from opentelemetry.metrics import (
     UpDownCounter,
 )
 from opentelemetry.sdk.util.instrumentation import InstrumentationScope
+from opentelemetry.util.types import Attributes
 from prometheus_client.samples import Sample
 import prometheus_client
 import prometheus_client.metrics
@@ -43,12 +44,13 @@ class PrometheusMeterProvider(MeterProvider):
         name: str,
         version: Optional[str] = None,
         schema_url: Optional[str] = None,
+        attributes: Optional[Attributes] = None,
     ) -> Meter:
         if not name:
             _logger.warning('Meter name cannot be None or empty.')
             return NoOpMeter(name, version=version, schema_url=schema_url)
 
-        info = InstrumentationScope(name, version, schema_url)
+        info = InstrumentationScope(name, version, schema_url, attributes)
         with self._meter_lock:
             if not self._meters.get(info):
                 self._meters[info] = PrometheusMeter(info)
