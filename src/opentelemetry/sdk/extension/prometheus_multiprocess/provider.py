@@ -68,8 +68,8 @@ class PrometheusMeter(Meter):
         self._instrument_id_instrument_lock = Lock()
 
     # Extracted from opentelemetry.sdk.metrics.Meter
-    def _create(self, api, cls, name, unit, description) -> Instrument:
-        status = self._register_instrument(name, cls, unit, description)
+    def _create(self, api, cls, name, unit, description, boundaries=None) -> Instrument:
+        status = self._register_instrument(name, cls, unit, description, boundaries)
 
         if status.conflict:
             self._log_instrument_registration_conflict(
@@ -83,7 +83,11 @@ class PrometheusMeter(Meter):
             with self._instrument_id_instrument_lock:
                 return self._instrument_id_instrument[status.instrument_id]
 
-        instrument = cls(name, unit, description)
+        # Questionable API design
+        if boundaries is not None:
+            instrument = cls(name, unit, description, boundaries)
+        else:
+            instrument = cls(name, unit, description)
         with self._instrument_id_instrument_lock:
             self._instrument_id_instrument[status.instrument_id] = instrument
             return instrument
@@ -119,9 +123,11 @@ class PrometheusMeter(Meter):
         name: str,
         unit: str = '',
         description: str = '',
+        explicit_bucket_boundaries_advisory: Optional[Sequence[float]] = None,
     ) -> Histogram:
         return self._create(
-            Histogram, PrometheusHistogram, name, unit, description)
+            Histogram, PrometheusHistogram, name, unit, description,
+            explicit_bucket_boundaries_advisory)
 
     def create_observable_counter(
         self,
@@ -296,10 +302,13 @@ class PrometheusHistogram(PrometheusMetric, Histogram):
             name: str,
             unit: str = '',
             description: str = '',
+            boundaries: Optional[Sequence[float]] = None,
     ) -> None:
-        if unit == 's':  # XXX kludgy
-            self.boundaries = (x / 1000 for x in self.boundaries)
-        self.metrics_kw = {'buckets': self.boundaries}
+        if boundaries is None:
+            boundaries = self.boundaries
+            if unit == 's':  # XXX kludgy
+                boundaries = (x / 1000 for x in boundaries)
+        self.metrics_kw = {'buckets': boundaries}
         super().__init__(name, unit, description)
 
     def record(

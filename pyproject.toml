@@ -3,7 +3,7 @@ name = "opentelemetry-sdk-extension-prometheus-multiprocess"
 authors = [{ name = "Zeit Online", email = "zon-backend@zeit.de" }]
 dynamic = ["version", "readme"]
 dependencies = [
-    "opentelemetry-sdk",
+    "opentelemetry-sdk >= 1.30.0.dev0",
     "requests",
     "opentelemetry-exporter-prometheus",
 ]
