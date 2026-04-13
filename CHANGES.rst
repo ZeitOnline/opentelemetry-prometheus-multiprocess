@@ -3,6 +3,15 @@ Changelog
 
 .. towncrier release notes start
 
+opentelemetry-sdk-extension-prometheus-multiprocess 1.3.0 (2026-04-13)
+----------------------------------------------------------------------
+
+Changes
++++++++
+
+- Ignore otel sdk internal metrics, they use async/observable collection, which we do not support (otel)
+
+
 1.2.3 (2025-02-06)
 ------------------
 
