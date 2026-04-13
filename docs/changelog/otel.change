@@ -1,0 +1,1 @@
+Ignore otel sdk internal metrics, they use async/observable collection, which we do not support

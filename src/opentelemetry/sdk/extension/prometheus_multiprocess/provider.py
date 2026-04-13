@@ -49,6 +49,10 @@ class PrometheusMeterProvider(MeterProvider):
         if not name:
             _logger.warning('Meter name cannot be None or empty.')
             return NoOpMeter(name, version=version, schema_url=schema_url)
+        if name == 'opentelemetry-sdk':
+            # otel sdk uses async/observerable metrics which we don't support.
+            _logger.debug('Ignoring opentelemtry-sdk internal metrics.')
+            return NoOpMeter(name, version=version, schema_url=schema_url)
 
         info = InstrumentationScope(name, version, schema_url, attributes)
         with self._meter_lock:
