@@ -209,9 +209,9 @@ class PrometheusMetric:
                 '%s already has values without any labels, cannot add %s' %
                 (self, attributes))
 
+        attributes = {sanitize_attribute(k): v for k, v in attributes.items()}
+        names = tuple(attributes)
         with self._lock:
-            attributes = {sanitize_attribute(k): v for k, v in attributes.items()}
-            names = tuple(attributes)
             for seen in self._seen_labelnames:
                 if len(seen) == len(names) and seen != names:
                     raise ValueError(
