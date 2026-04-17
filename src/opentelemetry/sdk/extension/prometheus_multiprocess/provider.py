@@ -217,8 +217,7 @@ class PrometheusMetric:
                     raise ValueError(
                         '%s already has values with labels %s, cannot add %s '
                         'of same length' % (self, seen, attributes))
-            else:
-                self._seen_labelnames.append(names)
+            self._seen_labelnames.append(names)
 
             self._metric._labelnames = names
             metric = self._metric.labels(**attributes)
