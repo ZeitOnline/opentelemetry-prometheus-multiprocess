@@ -220,7 +220,7 @@ class PrometheusMetric:
             else:
                 self._seen_labelnames.append(names)
 
-            self._metric._labelnames = tuple(attributes)
+            self._metric._labelnames = names
             metric = self._metric.labels(**attributes)
             self._metric._labelnames = self.DYNAMIC_LABELS
         return metric
