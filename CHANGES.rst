@@ -3,6 +3,15 @@ Changelog
 
 .. towncrier release notes start
 
+opentelemetry-sdk-extension-prometheus-multiprocess 1.4.0 (2026-04-17)
+----------------------------------------------------------------------
+
+Changes
++++++++
+
+- Prevent unbounded growth of label consistency check state (labels)
+
+
 opentelemetry-sdk-extension-prometheus-multiprocess 1.3.0 (2026-04-13)
 ----------------------------------------------------------------------
 
