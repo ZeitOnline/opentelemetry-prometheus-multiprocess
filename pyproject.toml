@@ -1,6 +1,6 @@
 [project]
 name = "opentelemetry-sdk-extension-prometheus-multiprocess"
-version = "1.4.0"
+version = "1.5.0.dev0"
 authors = [{ name = "Zeit Online", email = "zon-backend@zeit.de" }]
 dynamic = ["readme"]
 dependencies = [
