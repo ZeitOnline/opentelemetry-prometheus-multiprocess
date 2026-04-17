@@ -183,7 +183,7 @@ class PrometheusMetric:
             unit=map_unit(unit), **self.metric_kw)
         self._support_dynamic_labels()
         self._lock = Lock()
-        self._seen_labelnames = []
+        self._seen_labelnames = set()
 
     NON_ALPHANUMERIC = re.compile(r'[^\w]')
 
@@ -217,7 +217,7 @@ class PrometheusMetric:
                     raise ValueError(
                         '%s already has values with labels %s, cannot add %s '
                         'of same length' % (self, seen, attributes))
-            self._seen_labelnames.append(names)
+            self._seen_labelnames.add(names)
 
             self._metric._labelnames = names
             metric = self._metric.labels(**attributes)
