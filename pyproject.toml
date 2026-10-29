@@ -1,8 +1,7 @@
 [project]
 name = "opentelemetry-sdk-extension-prometheus-multiprocess"
-version = "1.5.0.dev0"
 authors = [{ name = "Zeit Online", email = "zon-backend@zeit.de" }]
-dynamic = ["readme"]
+dynamic = ["readme", "version"]
 dependencies = [
     "opentelemetry-sdk >= 1.30.0.dev0",
     "opentelemetry-exporter-prometheus",
@@ -13,34 +12,26 @@ test = [
     "pytest",
 ]
 
-[dependency-groups]
-release = ["towncrier"]
+[project.urls]
+Repository = "https://github.com/ZeitOnline/opentelemetry-prometheus-multiprocess"
+Changelog = "https://github.com/ZeitOnline/opentelemetry-prometheus-multiprocess/blob/main/CHANGES.md"
 
 [build-system]
-requires = ["hatchling", "hatch-fancy-pypi-readme"]
+requires = ["hatchling", "hatch-fancy-pypi-readme", "hatch-vcs"]
 build-backend = "hatchling.build"
+
+[tool.hatch.version]
+source = "vcs"
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/opentelemetry"]
 
 [tool.hatch.metadata.hooks.fancy-pypi-readme]
-content-type = "text/x-rst"
-fragments = [{path="README.rst"}, {text="\n\n"}, {path="CHANGES.rst"}]
+content-type = "text/markdown"
+fragments = [{path="README.md"}, {text="\n\n"}, {path="CHANGES.md"}]
 
 [tool.pytest.ini_options]
 addopts = "--tb=native"
 filterwarnings = [
   "error",
 ]
-
-[tool.towncrier]
-directory = "docs/changelog/"
-filename = "CHANGES.rst"
-title_format = ""
-# First underline is used for version/date header.
-# Second underline is used for the type names (like 'Bug fixes:').
-underlines = ["-", "+"]
-[[tool.towncrier.type]]
-directory = "change"
-name = "Changes"  # I'd love to omit the category, but that requires copy&paste of the whole template
-showcontent = true
