@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.4.1](https://github.com/ZeitOnline/opentelemetry-prometheus-multiprocess/compare/1.4.0...1.4.1) (2026-10-30)
+
+
+### Maintenance
+
+* release with Release Please via the shared pypi-release workflow ([#4](https://github.com/ZeitOnline/opentelemetry-prometheus-multiprocess/issues/4)) ([25b341f](https://github.com/ZeitOnline/opentelemetry-prometheus-multiprocess/commit/25b341fa39f39f3e8c5ca57a5f156d91612c7661))
+
 ## 1.4.0 (2026-04-17)
 
 - Prevent unbounded growth of label consistency check state (labels)
