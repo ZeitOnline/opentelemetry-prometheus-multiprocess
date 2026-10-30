@@ -1,0 +1,17 @@
+{
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
+  "bootstrap-sha": "53b5552b9c3c4a0470298b3ad67315d4ed658632",
+  "release-type": "python",
+  "include-v-in-tag": false,
+  "changelog-path": "CHANGES.md",
+  "changelog-sections": [
+    {"type": "feat", "section": "Features"},
+    {"type": "fix", "section": "Bug Fixes"},
+    {"type": "perf", "section": "Performance Improvements"},
+    {"type": "deps", "section": "Dependencies"},
+    {"type": "revert", "section": "Reverts"},
+    {"type": "docs", "section": "Documentation"},
+    {"type": "chore", "section": "Maintenance"}
+  ],
+  "packages": {".": {}}
+}
